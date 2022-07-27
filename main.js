@@ -20,8 +20,12 @@ app.use(session({
 }));
 
 var passport = require('passport')
-  , LocalStrategy = require('passport-local')
-  .Strategy;
+  , LocalStrategy = require('passport-local').Strategy;
+app.post('/auth/login_process',
+  passport.authenticate('local', { // local -> username과 password를 이용
+    successRedirect: '/', // 성공하면 홈으로
+    failureRedirect: '/auth/login' // 실패하면 로그인 재진입
+  }));
 
 app.get('*', function (request, response, next) {
   fs.readdir('./data', function (error, filelist) {
