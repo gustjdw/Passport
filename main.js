@@ -6,6 +6,7 @@ var compression = require('compression');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var helmet = require('helmet');
+var flash = require('connect-flash');
 
 app.use(helmet());
 app.use(express.static('public'));
@@ -18,6 +19,19 @@ app.use(session({
   saveUninitialized: true,
   store: new FileStore()
 }));
+
+app.use(flash());
+app.get('/flash', function(req, res) {
+  // Set a flash message by passing the key, followed by the value, to req.flash()
+  req.flash('msg', 'Flash is back!!'); // session store에 입력한 데이터 추가
+  res.send('flash');
+});
+app.get('/flash-display', function(req, res) {
+  // Get an array of flash messages by passing the key to req.flash()
+  var fmsg = req.flash();
+  console.log(fmsg);
+  res.send(fmsg);
+});
 
 var authData = {
   email: 'egoing777@gmail.com',
