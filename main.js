@@ -28,6 +28,18 @@ var authData = {
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function (user, done) {
+  console.log('serializeUser', user);
+  done(null, user.email);
+});
+passport.deserializeUser(function (id, done) {
+  console.log('deserializerUser', id);
+  done(null, authData);
+});
+
 passport.use(new LocalStrategy(
   {
     usernameField: 'email',
@@ -35,29 +47,29 @@ passport.use(new LocalStrategy(
   },
   function (username, password, done) {
     console.log('LocalStrategy', username, password);
-    if (username === authData.email) { // email이 맞으면
+    if (username === authData.email) {
       console.log('email 존재');
-      if (password === authData.password) { // password도 다 맞으면
+      if (password === authData.password) {
         console.log('로그인 성공');
-        return done(null, authData); // 성공
-      } else { // password만 틀리다면
+        return done(null, authData);
+      } else {
         console.log('Incorrect password.');
-        return done(null, false, { // 실패 - 잘못된 비밀번호
+        return done(null, false, {
           message: 'Incorrect password.'
         });
       }
-    } else { // email이 틀리면
+    } else {
       console.log('Incorrect username.');
-      return done(null, false, { // 실패 - 잘못된 email
+      return done(null, false, {
         message: 'Incorrect username.'
       });
     }
   }));
 
 app.post('/auth/login_process',
-  passport.authenticate('local', { // local -> username과 password를 이용
-    successRedirect: '/', // 성공하면 홈으로
-    failureRedirect: '/auth/login' // 실패하면 로그인 재진입
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/auth/login'
   }));
 
 app.get('*', function (request, response, next) {
