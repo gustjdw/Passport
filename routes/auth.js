@@ -3,9 +3,15 @@ var router = express.Router();
 var template = require('../lib/template.js');
 
 router.get('/login', function (request, response) {
+  var fmsg = request.flash();
+  var feedback = '';
+  if (fmsg.error) {
+    feedback = fmsg.error[0];
+  }
   var title = 'WEB - login';
   var list = template.list(request.list);
   var html = template.HTML(title, list, `
+    <div style="color:red;">${feedback}</div>
     <form action="/auth/login_process" method="post">
       <p><input type="text" name="email" placeholder="email"></p>
       <p><input type="password" name="pwd" placeholder="password"></p>
@@ -18,7 +24,7 @@ router.get('/login', function (request, response) {
 });
 
 router.get('/logout', function (request, response) {
-  request.logout(function(err) {
+  request.logout(function (err) {
     response.redirect('/');
   });
 });
